@@ -42,7 +42,7 @@ public class AttrController {
     @GetMapping("list")
     public Result<List<AttrKeyVo>> listAttrInfo() {
         List<AttrKeyVo> list=attrKeyService.listattrinfo();
-        return Result.ok();
+        return Result.ok(list);
     }
 
     @Operation(summary = "根据id删除属性名称")

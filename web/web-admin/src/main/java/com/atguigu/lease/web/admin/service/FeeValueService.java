@@ -1,7 +1,10 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.FeeValue;
+import com.atguigu.lease.web.admin.vo.fee.FeeKeyVo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author liubo
@@ -10,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface FeeValueService extends IService<FeeValue> {
 
+    List<FeeKeyVo> feelist();
 }
