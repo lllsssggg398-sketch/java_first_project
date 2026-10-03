@@ -15,6 +15,8 @@ import java.util.List;
 public interface LabelInfoMapper extends BaseMapper<LabelInfo> {
 
     List<LabelInfo> queryLabel(Long id);
+
+    List<LabelInfo> selectListByRoomId(Long id);
 }
 
 
