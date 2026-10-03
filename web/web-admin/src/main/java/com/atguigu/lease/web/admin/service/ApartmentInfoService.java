@@ -6,8 +6,9 @@ import com.atguigu.lease.web.admin.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.web.admin.vo.apartment.ApartmentQueryVo;
 import com.atguigu.lease.web.admin.vo.apartment.ApartmentSubmitVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author liubo
@@ -16,4 +17,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ApartmentInfoService extends IService<ApartmentInfo> {
 
+    void customService(ApartmentSubmitVo apartmentSubmitVo);
+
+    void customRemoveByid(Long id);
+
+    IPage<ApartmentItemVo> pageApartmentItemByQuery(IPage<ApartmentItemVo> page, ApartmentQueryVo queryVo);
+
+    ApartmentDetailVo apartmentinfoById(Long id);
 }

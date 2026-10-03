@@ -3,5 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.lease.web.admin.mapper.ApartmentInfoMapper">
+    <select id="pagrApartmentItemByQuery" resultType="com.atguigu.lease.web.admin.vo.apartment.ApartmentItemVo">
+        select t0.*,ifnull(t1.`总房间数`,0),ifnull(t2.`在租房间数`,0),
+        ifnull(t1.`总房间数`,0)-ifnull(t2.`在租房间数`,0) 空闲房间数
+        from(select * from apartment_info where is_deleted=0
+        <if test="queryVo.provinceId!=null">
+            and province_id=#{queryVo.provinceId}
+        </if>
+        <if test="queryVo.cityId!=null" >
+            and city_id=#{queryVo.cityId}
+        </if>
+        <if test="queryVo.districtId!=null">
+            and district_id=#{queryVo.districtId}
+        </if>
+        ) t0
+        left join
+        (select apartment_id,count(*) 总房间数 from room_info where is_deleted=0 group by apartment_id) t1
+        on t0.id=t1.apartment_id
+        left join
+        (select apartment_id,count(*) 在租房间数 from lease_agreement where is_deleted=0 and `status` in (2,5,7) group by apartment_id) t2
+        on t1.apartment_id=t2.apartment_id
+    </select>
 
 </mapper>

@@ -15,6 +15,7 @@ import java.util.List;
 */
 public interface GraphInfoMapper extends BaseMapper<GraphInfo> {
 
+    List<GraphVo> queryList(ItemType apartment, Long id);
 }
 
 
