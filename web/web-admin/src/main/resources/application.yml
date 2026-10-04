@@ -1,6 +1,10 @@
 server:
   port: 8080
 spring:
+  data:
+    redis:
+      host: 192.168.6.100
+      port: 6379
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://127.0.0.1:3306/lease?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
@@ -36,4 +40,9 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket-name: java-first-project
+admin:
+  auth:
+    path-patterns:
+      include: /admin/**
+      exclude: /admin/login/**
 
