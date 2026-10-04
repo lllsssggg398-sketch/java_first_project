@@ -23,6 +23,7 @@ public class UserInfo extends BaseEntity {
 
     @Schema(description = "密码")
     @TableField(value = "password")
+
     private String password;
 
     @Schema(description = "头像url")
