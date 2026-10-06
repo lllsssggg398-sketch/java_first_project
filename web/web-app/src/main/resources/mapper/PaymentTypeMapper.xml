@@ -5,4 +5,12 @@
 <mapper namespace="com.atguigu.lease.web.app.mapper.PaymentTypeMapper">
 
 
+    <select id="listPaymentTypeByRoomId" resultType="com.atguigu.lease.model.entity.PaymentType">
+        select id,
+               name,
+               pay_month_count,
+               additional_info
+        from payment_type
+        where id = #{id}
+    </select>
 </mapper>
