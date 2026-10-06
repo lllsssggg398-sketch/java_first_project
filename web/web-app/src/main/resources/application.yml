@@ -14,10 +14,25 @@ spring:
       maximum-pool-size: 12 #连接池最大连接数，默认是10
       minimum-idle: 10 #最小空闲连接数量
       pool-name: SPHHikariPool # 连接池名称
-
+  data:
+    redis:
+      host: 192.168.6.100
+      port: 6379
+      database: 0
 #用于打印框架生成的sql语句，便于调试
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 springdoc:
   default-flat-param-object: true
+aliyun:
+  sms:
+    access-key-id: <access-key-id>
+    access-key-secret: <access-key-secret>
+    endpoint: dysmsapi.aliyuncs.com
+app:
+  auth:
+    path-patterns:
+      include: /app/**
+      exclude: /app/login/**
+
