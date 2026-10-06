@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 public interface ApartmentInfoMapper extends BaseMapper<ApartmentInfo> {
 
 
+    ApartmentInfo selectApartmentById(Long apartmentId);
 }
 
 

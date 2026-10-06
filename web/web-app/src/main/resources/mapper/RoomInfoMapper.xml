@@ -3,5 +3,147 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.lease.web.app.mapper.RoomInfoMapper">
+    <!-- result map -->
+    <resultMap id="RoomItemVoMap" type="com.atguigu.lease.web.app.vo.room.RoomItemVo" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="apartmentInfo" javaType="com.atguigu.lease.model.entity.ApartmentInfo" autoMapping="true">
+            <id property="id" column="apart_id"/>
+            <result property="isRelease" column="apart_is_release"/>
+        </association>
+        <collection property="graphVoList" ofType="com.atguigu.lease.web.app.vo.graph.GraphVo" autoMapping="true" select="listGraphVoByRoomId" column="id"/>
+        <collection property="labelInfoList" ofType="com.atguigu.lease.model.entity.LabelInfo" autoMapping="true" select="listLabelByRoomId" column="id"/>
+    </resultMap>
 
+    <!-- 根据条件查询房间列表 -->
+    <select id="pageRoomItemByQuery" resultMap="RoomItemVoMap">
+        select
+        ri.id,
+        ri.room_number,
+        ri.rent,
+        ri.apartment_id,
+        ri.is_release,
+        ai.id         apart_id,
+        ai.name,
+        ai.introduction,
+        ai.district_id,
+        ai.district_name,
+        ai.city_id,
+        ai.city_name,
+        ai.province_id,
+        ai.province_name,
+        ai.address_detail,
+        ai.latitude,
+        ai.longitude,
+        ai.phone,
+        ai.is_release apart_is_release
+        from room_info ri
+        left join apartment_info ai on ai.is_deleted=0
+        on ri.apartment_id=ai.id
+        <where>
+            ri.is_deleted=0
+            and ai.is_deleted=0
+            and ri.id not in(
+            select room_id
+            from lease_agreement
+            where is_deleted = 0
+            and status in(${@com.atguigu.lease.model.enums.LeaseStatus@SIGNED.getCode()},
+            ${@com.atguigu.lease.model.enums.LeaseStatus@WITHDRAWING.getCode()}))
+            and ri.is_release = ${@com.atguigu.lease.model.enums.ReleaseStatus@RELEASED.getCode()}
+            <if test="queryVo.provinceId != null">
+                and ai.province_id = #{queryVo.provinceId}
+            </if>
+            <if test="queryVo.cityId != null">
+                and ai.province_id = #{queryVo.cityId}
+            </if>
+            <if test="queryVo.districtId != null">
+                and ai.province_id = #{queryVo.districtId}
+            </if>
+            <if test="queryVo.minRent != null and queryVo.maxRent != null">
+                and (ri.rent &gt;= #{queryVo.minRent} and ri.rent &lt;= #{queryVo.maxRent})
+            </if>
+            <if test="queryVo.paymentTypeId != null">
+                and ri.id in (
+                select
+                room_id
+                from room_payment_type
+                where is_deleted = 0
+                and payment_type_id = #{queryVo.paymentTypeId}
+                )
+            </if>
+        </where>
+        <if test="queryVo.orderType == 'desc' or queryVo.orderType == 'asc'">
+            order by ri.rent ${queryVo.orderType}
+        </if>
+    </select>
+
+    <!-- 根据房间ID查询图片列表 -->
+    <select id="listGraphVoByRoomId" resultType="com.atguigu.lease.web.app.vo.graph.GraphVo">
+        select
+            name,
+            url
+        from graph_info
+        where is_deleted = 0
+          and item_id=#{id}
+    </select>
+
+    <!-- 根据公寓ID查询标签列表 -->
+    <select id="listLabelByRoomId" resultType="com.atguigu.lease.model.entity.LabelInfo">
+        select id,
+               name
+        from label_info
+        where is_deleted = 0
+          and id in (select label_id
+                     from room_label
+                     where is_deleted = 0
+                       and room_id = #{id})
+    </select>
+    <select id="selectRoomById" resultType="com.atguigu.lease.model.entity.RoomInfo">
+        select id,
+               room_number,
+               rent,
+               apartment_id,
+               is_release,
+               is_deleted
+        from room_info
+        where id = #{id}
+    </select>
+    <select id="selectMinRentByApartmentId" resultType="java.math.BigDecimal">
+        select min(rent)
+        from room_info
+        where is_deleted = 0
+          and apartment_id = #{id}
+    </select>
+    <select id="pageItemByApartmentId" resultMap="RoomItemVoMap">
+        select ri.id,
+               ri.room_number,
+               ri.rent,
+               ri.apartment_id,
+               ri.is_release,
+               ai.id         apart_id,
+               ai.name,
+               ai.introduction,
+               ai.district_id,
+               ai.district_name,
+               ai.city_id,
+               ai.city_name,
+               ai.province_id,
+               ai.province_name,
+               ai.address_detail,
+               ai.latitude,
+               ai.longitude,
+               ai.phone,
+               ai.is_release apart_is_release
+        from room_info ri
+                 left join apartment_info ai
+                           on ri.apartment_id = ai.id
+        where ri.is_deleted = 0
+          and ai.is_deleted = 0
+          and ai.id = #{id}
+          and ri.id not in (select room_id
+                            from lease_agreement
+                            where is_deleted = 0
+                              and status in (${@com.atguigu.lease.model.enums.LeaseStatus@SIGNED.getCode()},
+                                             ${@com.atguigu.lease.model.enums.LeaseStatus@WITHDRAWING.getCode()}))
+          and ri.is_release = ${@com.atguigu.lease.model.enums.ReleaseStatus@RELEASED.getCode()}
+    </select>
 </mapper>

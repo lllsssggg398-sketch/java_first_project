@@ -13,4 +13,17 @@
         from payment_type
         where id = #{id}
     </select>
+    <select id="selectListByRoomId" resultType="com.atguigu.lease.model.entity.PaymentType">
+        select id,
+               name,
+               pay_month_count,
+               additional_info
+        from payment_type
+        where is_deleted = 0
+          and id in
+              (select payment_type_id
+               from room_payment_type
+               where is_deleted = 0
+                 and room_id = #{id})
+    </select>
 </mapper>

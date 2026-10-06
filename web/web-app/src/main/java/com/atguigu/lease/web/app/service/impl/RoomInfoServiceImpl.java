@@ -5,8 +5,7 @@ import com.atguigu.lease.model.entity.*;
 import com.atguigu.lease.model.enums.ItemType;
 import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.web.app.mapper.*;
-import com.atguigu.lease.web.app.service.BrowsingHistoryService;
-import com.atguigu.lease.web.app.service.RoomInfoService;
+import com.atguigu.lease.web.app.service.*;
 import com.atguigu.lease.web.app.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.web.app.vo.attr.AttrValueVo;
 import com.atguigu.lease.web.app.vo.fee.FeeValueVo;
@@ -35,7 +34,90 @@ import java.util.List;
 public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo>
         implements RoomInfoService {
 
+    @Autowired
+    private RoomInfoMapper roomInfoMapper;
+    @Autowired
+    private ApartmentInfoService apartmentInfoService;
+    @Autowired
+    private GraphInfoMapper graphInfoMapper;
+    @Autowired
+    private AttrValueMapper attrValueMapper;
+    @Autowired
+    private FacilityInfoMapper facilityInfoMapper;
+    @Autowired
+    private LabelInfoMapper labelInfoMapper;
+    @Autowired
+    private PaymentTypeMapper paymentTypeMapper;
+    @Autowired
+    private LeaseTermMapper leaseTermMapper;
+    @Autowired
+    private FeeValueMapper feeValueMapper;
+    @Autowired
+    private LeaseAgreementMapper leaseAgreementMapper;
+    @Override
+    public IPage<RoomItemVo> pageRoomItemByQuery(Page<RoomItemVo> page, RoomQueryVo queryVo) {
+        return roomInfoMapper.pageRoomItemByQuery(page, queryVo);
+    }
 
+    @Override
+    public RoomDetailVo getRoomDetailById(Long id) {
+        //1.查询RoomInfo
+        RoomInfo roomInfo = roomInfoMapper.selectRoomById(id);
+        if (roomInfo == null) {
+            return null;
+        }
+
+        //2.查询所属公寓信息
+        ApartmentItemVo apartmentItemVo = apartmentInfoService.selectApartmentItemVoById(roomInfo.getApartmentId());
+
+        //3.查询graphInfoList
+        List<GraphVo> graphVoList = graphInfoMapper.selectListByItemTypeAndId(ItemType.ROOM, id);
+
+        //4.查询attrValueList
+        List<AttrValueVo> attrvalueVoList = attrValueMapper.selectListByRoomId(id);
+
+        //5.查询facilityInfoList
+        List<FacilityInfo> facilityInfoList = facilityInfoMapper.selectListByRoomId(id);
+
+        //6.查询labelInfoList
+        List<LabelInfo> labelInfoList = labelInfoMapper.selectListByRoomId(id);
+
+        //7.查询paymentTypeList
+        List<PaymentType> paymentTypeList = paymentTypeMapper.selectListByRoomId(id);
+
+        //8.查询leaseTermList
+        List<LeaseTerm> leaseTermList = leaseTermMapper.selectListByRoomId(id);
+
+        //9.查询费用项目信息
+        List<FeeValueVo> feeValueVoList = feeValueMapper.selectListByApartmentId(roomInfo.getApartmentId());
+
+        //10.查询房间入住状态
+        LambdaQueryWrapper<LeaseAgreement> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LeaseAgreement::getRoomId, roomInfo.getId());
+        queryWrapper.in(LeaseAgreement::getStatus, LeaseStatus.SIGNED, LeaseStatus.WITHDRAWING);
+        Long singedCount = leaseAgreementMapper.selectCount(queryWrapper);
+
+        RoomDetailVo appRoomDetailVo = new RoomDetailVo();
+        BeanUtils.copyProperties(roomInfo, appRoomDetailVo);
+        appRoomDetailVo.setIsDelete(roomInfo.getIsDeleted() == 1);
+        appRoomDetailVo.setIsCheckIn(singedCount > 0);
+
+        appRoomDetailVo.setApartmentItemVo(apartmentItemVo);
+        appRoomDetailVo.setGraphVoList(graphVoList);
+        appRoomDetailVo.setAttrValueVoList(attrvalueVoList);
+        appRoomDetailVo.setFacilityInfoList(facilityInfoList);
+        appRoomDetailVo.setLabelInfoList(labelInfoList);
+        appRoomDetailVo.setPaymentTypeList(paymentTypeList);
+        appRoomDetailVo.setFeeValueVoList(feeValueVoList);
+        appRoomDetailVo.setLeaseTermList(leaseTermList);
+
+        return appRoomDetailVo;
+    }
+
+    @Override
+    public IPage<RoomItemVo> pageItemByApartmentId(IPage<RoomItemVo> page, Long id) {
+        return roomInfoMapper.pageItemByApartmentId(page, id);
+    }
 }
 
 
