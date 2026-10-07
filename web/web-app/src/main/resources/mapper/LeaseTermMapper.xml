@@ -14,4 +14,11 @@
                      where is_deleted = 0
                        and room_id = #{id})
     </select>
+    <select id="selectLeaseTermById" resultType="com.atguigu.lease.model.entity.LeaseTerm">
+        select id,
+               month_count,
+               unit
+        from lease_term
+        where id = #{id}
+    </select>
 </mapper>

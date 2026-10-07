@@ -26,4 +26,12 @@
                where is_deleted = 0
                  and room_id = #{id})
     </select>
+    <select id="selectPaymentTypeById" resultType="com.atguigu.lease.model.entity.PaymentType">
+        select id,
+               name,
+               pay_month_count,
+               additional_info
+        from payment_type
+        where id = #{id}
+    </select>
 </mapper>
