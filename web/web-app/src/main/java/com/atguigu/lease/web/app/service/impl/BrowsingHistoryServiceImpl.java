@@ -25,7 +25,12 @@ import java.util.Date;
 public class BrowsingHistoryServiceImpl extends ServiceImpl<BrowsingHistoryMapper, BrowsingHistory>
         implements BrowsingHistoryService {
 
-
+    @Autowired
+    BrowsingHistoryMapper browsingHistoryMapper;
+    @Override
+    public IPage<HistoryItemVo> pageHistoryItemByUserId(IPage<HistoryItemVo> page, Long userId) {
+        return browsingHistoryMapper.pageHistoryItemByUserId(page, userId);
+    }
 }
 
 
