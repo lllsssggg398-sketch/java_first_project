@@ -16,4 +16,5 @@
                where is_deleted = 0
                  and room_id = #{id})
     </select>
+
 </mapper>

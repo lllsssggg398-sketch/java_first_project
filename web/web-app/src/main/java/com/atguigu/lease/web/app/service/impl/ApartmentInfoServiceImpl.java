@@ -35,6 +35,8 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
     private GraphInfoMapper graphInfoMapper;
     @Autowired
     private RoomInfoMapper roomInfoMapper;
+    @Autowired
+    private FacilityInfoMapper facilityInfoMapper;
     @Override
     public ApartmentItemVo selectApartmentItemVoById(Long apartmentId) {
         ApartmentInfo apartmentInfo = apartmentInfoMapper.selectApartmentById(apartmentId);
@@ -53,6 +55,37 @@ public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, A
         apartmentItemVo.setMinRent(minRent);
 
         return apartmentItemVo;
+    }
+
+    @Override
+    public ApartmentDetailVo getApartmentDetailById(Long id) {
+        //1.查询ApartmentInfo
+        ApartmentInfo apartmentInfo = apartmentInfoMapper.selectApartmentById(id);
+        if (apartmentInfo == null) {
+            return null;
+        }
+
+        //2.查询GraphInfo
+        List<GraphVo> graphVoList = graphInfoMapper.selectListByItemTypeAndId(ItemType.APARTMENT, id);
+
+        //3.查询LabelInfo
+        List<LabelInfo> labelInfoList = labelInfoMapper.selectListByApartmentId(id);
+
+        //4.查询FacilityInfo
+        List<FacilityInfo> facilityInfoList = facilityInfoMapper.selectListByRoomId(id);
+
+        //5.查询公寓最低房租
+        BigDecimal minRent = roomInfoMapper.selectMinRentByApartmentId(id);
+
+        ApartmentDetailVo appApartmentDetailVo = new ApartmentDetailVo();
+
+        BeanUtils.copyProperties(apartmentInfo, appApartmentDetailVo);
+        appApartmentDetailVo.setIsDelete(apartmentInfo.getIsDeleted() == 1);
+        appApartmentDetailVo.setGraphVoList(graphVoList);
+        appApartmentDetailVo.setLabelInfoList(labelInfoList);
+        appApartmentDetailVo.setFacilityInfoList(facilityInfoList);
+        appApartmentDetailVo.setMinRent(minRent);
+        return appApartmentDetailVo;
     }
 }
 

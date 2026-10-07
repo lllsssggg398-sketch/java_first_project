@@ -14,4 +14,6 @@ public interface ApartmentInfoService extends IService<ApartmentInfo> {
 
 
     ApartmentItemVo selectApartmentItemVoById(Long apartmentId);
+
+    ApartmentDetailVo getApartmentDetailById(Long id);
 }
